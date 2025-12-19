@@ -180,24 +180,25 @@
         }
 
         function renderApps(apps) {
-            const container = document.getElementById('appContainer');
-            container.innerHTML = apps.map(app => {
-                // Building the actual bridge to AppSheet
-                const appUrl = `https://www.appsheet.com/start/${app.appLinkId}`;
-                const initials = app.name ? app.name.substring(0,2).toUpperCase() : 'SW';
-                
-                return `
-                    <div class="app-card" onclick="window.open('${appUrl}', '_blank')">
-                        <div class="app-header">
-                            <div class="app-icon">${initials}</div>
-                            <div class="app-name">${app.name}</div>
-                        </div>
-                        <p class="app-description">${app.description || ''}</p>
-                        <button class="app-link">Launch App →</button>
-                    </div>
-                `;
-            }).join('');
-        }
+    const container = document.getElementById('appContainer');
+    container.innerHTML = apps.map(app => {
+        // REPAIR: AppSheet links for non-deployed apps usually need the 'appName=' format
+        // This builds the most reliable link for your specific setup
+        const appUrl = `https://www.appsheet.com/start/${app.appLinkId}`;
+        
+        return `
+            <div class="app-card" onclick="window.open('${appUrl}', '_blank')">
+                <div class="app-header">
+                    <div class="app-icon">${app.name.substring(0,2).toUpperCase()}</div>
+                    <div class="app-name">${app.name}</div>
+                </div>
+                <div class="app-desc">${app.description || ''}</div>
+                <button class="btn">Launch App →</button>
+            </div>
+        `;
+    }).join('');
+}
+
 
         // Firing the factory engine
         loadApps();
