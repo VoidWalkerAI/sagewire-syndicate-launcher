@@ -97,14 +97,20 @@
                     return;
                 }
 
-                container.innerHTML = data.apps.map(app => `
-                    <div class="app-card" onclick="window.open('${app.appUrl}', '_blank')">
-                        <div class="app-icon">${app.name ? app.name.substring(0,2).toUpperCase() : 'SW'}</div>
-                        <div class="app-name">${app.name}</div>
-                        <div class="app-desc">${app.description || ''}</div>
-                        <button class="btn">Launch App →</button>
-                    </div>
-                `).join('');
+                container.innerHTML = data.apps.map(app => {
+    // This grabs the link from your "App Link ID" column
+    const link = app["App Link ID"] || app.appUrl || app.actualLink;
+    
+    return `
+        <div class="app-card" onclick="window.open('${link}', '_blank')">
+            <div class="app-icon">${app["App Name"] ? app["App Name"].substring(0,2).toUpperCase() : 'SW'}</div>
+            <div class="app-name">${app["App Name"]}</div>
+            <div class="app-desc">${app.Description || ''}</div>
+            <button class="btn">Launch App →</button>
+        </div>
+    `;
+}).join('');
+
             } catch (e) {
                 document.getElementById('appContainer').innerHTML = "<p>Connection Error. Ensure your Sheet has full https:// links in Column C.</p>";
             }
