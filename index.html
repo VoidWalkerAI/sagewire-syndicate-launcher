@@ -442,44 +442,40 @@
             window.open(url, '_blank');
         }
 
-        // Render apps
-        function renderApps(apps) {
-            const container = document.getElementById('appContainer');
-            
-            if (apps.length === 0) {
-                container.innerHTML = `
-                    <div class="loading">
-                        <p>No applications found matching your search</p>
-                    </div>
-                `;
-                return;
-            }
+        // IMPROVED RENDERER: Fixes links for the Cattle App suite
+function renderApps(apps) {
+    const container = document.getElementById('appContainer');
+    
+    if (apps.length === 0) {
+        container.innerHTML = '<div class="loading"><p>No cattle apps found</p></div>';
+        return;
+    }
 
-            container.innerHTML = apps.map(app => {
-                const appUrl = `https://www.appsheet.com/start/${app.appLinkId}`;
-                const icon = getAppIcon(app.name);
-                
-                return `
-                    <div class="app-card" onclick="openApp('${appUrl}', '${app.name}')">
-                        <div class="app-header">
-                            <div class="app-icon">${icon}</div>
-                            <div class="app-name">${app.name}</div>
-                        </div>
-                        <div class="app-description">${app.description || 'No description available'}</div>
-                        <div class="app-footer">
-                            <a href="${appUrl}" class="app-link" onclick="event.stopPropagation()">
-                                Open App →
-                            </a>
-                            <div class="copy-id" 
-                                 onclick="event.stopPropagation(); copyToClipboard('${app.appLinkId}', '${app.name}')" 
-                                 title="Copy App ID">
-                                📋
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+    container.innerHTML = apps.map(app => {
+        // FIX: Ensuring the URL is a full AppSheet start link for each cattle module
+        const appUrl = app.appLinkId.startsWith('http') 
+            ? app.appLinkId 
+            : `https://www.appsheet.com/start/${app.appLinkId}`;
+            
+        const icon = getIcon(app.name);
+        
+        return `
+            <div class="app-card" onclick="window.open('${appUrl}', '_blank')">
+                <div class="app-header">
+                    <div class="app-icon">${icon}</div>
+                    <div class="app-name">${app.name}</div>
+                </div>
+                <div class="app-description">${app.description || ''}</div>
+                <div class="app-footer">
+                    <button class="app-link">Launch Cattle Tool →</button>
+                    <div class="copy-id" 
+                         onclick="event.stopPropagation(); copyToClipboard('${app.appLinkId}', '${app.name}')" 
+                         title="Copy App ID">📋</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
         // Load apps from Google Sheets
         async function loadApps(forceRefresh = false) {
