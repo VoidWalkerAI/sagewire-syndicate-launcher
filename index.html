@@ -3,205 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1a1a2e">
     <title>SageWire Syndicate Launcher</title>
     <style>
-        :root {
-            --primary: #e94560;
-            --secondary: #f39c12;
-            --dark: #1a1a2e;
-            --darker: #16213e;
-            --accent: #0f3460;
-            --text: #ffffff;
-            --text-muted: #94a3b8;
+        :root { 
+            --p: #e94560; 
+            --s: #f39c12; 
+            --bg: #1a1a2e; 
+            --txt: #ffffff; 
+        }
+        body { 
+            background: var(--bg); 
+            color: var(--txt); 
+            font-family: sans-serif; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        h1 { 
+            background: linear-gradient(135deg, var(--p), var(--s)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            font-size: 2.2rem; 
+            margin-bottom: 10px; 
+            font-weight: bold;
+        }
+        p.subtitle { color: #94a3b8; margin-bottom: 30px; font-size: 1rem; }
+        
+        .app-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            padding: 30px 0;
-            border-bottom: 2px solid var(--accent);
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        /* Fixed Grid: Prevents the "Ugly" Stretching */
-        .app-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 10px;
-        }
-
-        .app-card {
-            background: rgba(15, 52, 96, 0.5);
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.3s ease;
+        .app-card { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid #30475e; 
+            border-radius: 15px; 
+            padding: 20px; 
+            text-align: left; 
+            transition: 0.3s; 
             cursor: pointer;
-            backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
         }
-
-        .app-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
-        }
-
-        .app-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .app-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
+        .app-card:hover { transform: translateY(-5px); border-color: var(--p); }
+        .app-icon { 
+            width: 50px; 
+            height: 50px; 
+            background: linear-gradient(135deg, var(--p), var(--s)); 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            margin-bottom: 15px; 
             color: white;
-            flex-shrink: 0;
         }
-
-        .app-name {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .app-description {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
-
-        .app-link {
-            background: linear-gradient(135deg, var(--primary), #d63447);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 600;
-            border: none;
-            width: 100%;
+        .app-name { font-size: 1.25rem; color: var(--p); font-weight: bold; margin-bottom: 8px; }
+        .app-desc { color: #94a3b8; font-size: 0.9rem; flex-grow: 1; margin-bottom: 15px; }
+        .btn { 
+            background: var(--p); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
+            border-radius: 8px; 
+            font-weight: bold; 
             cursor: pointer;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px;
-            grid-column: 1 / -1;
-        }
-
-        .spinner {
-            border: 4px solid rgba(233, 69, 96, 0.1);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        @media (max-width: 600px) {
-            .app-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>⚡ SageWire Syndicate</h1>
-        <p>Independent App Launcher</p>
-    </div>
-
+    <h1>⚡ SageWire Syndicate</h1>
+    <p class="subtitle">Independent App Launcher</p>
+    
     <div id="appContainer" class="app-grid">
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Connecting to SageWire API...</p>
-        </div>
+        <p style="grid-column: 1/-1;">Connecting to live directory...</p>
     </div>
 
     <script>
-        // LIVE API URL: Corrected from your deployment screenshot
-        const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbxWs6qOjGhm776gjaCXANaVu1hF_Z8hDVLMmXEmfr7S4jwCXB3lWjjLVSYNGExHmWW6fA/exec';
+        // Use the live URL you provided
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxWs6qOjGhm776gjaCXANaVu1hF_Z8hDVLMmXEmfr7S4jwCXB3lWjjLVSYNGExHmWW6fA/exec';
 
-        async function loadApps() {
-            const container = document.getElementById('appContainer');
+        async function load() {
             try {
-                const response = await fetch(SHEET_API_URL);
-                const data = await response.json();
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const container = document.getElementById('appContainer');
                 
-                if (data.apps && data.apps.length > 0) {
-                    renderApps(data.apps);
-                } else {
-                    container.innerHTML = '<p class="loading">No apps found in your Google Sheet.</p>';
+                if (!data.apps || data.apps.length === 0) {
+                    container.innerHTML = "<p>No apps found. Check your Google Sheet naming.</p>";
+                    return;
                 }
-            } catch (error) {
-                console.error('API Error:', error);
-                container.innerHTML = '<p class="loading">Error: Could not connect to Google Sheets. Check permissions.</p>';
+
+                container.innerHTML = data.apps.map(app => `
+                    <div class="app-card" onclick="window.open('${app.appUrl}', '_blank')">
+                        <div class="app-icon">${app.name ? app.name.substring(0,2).toUpperCase() : 'SW'}</div>
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-desc">${app.description || ''}</div>
+                        <button class="btn">Launch App →</button>
+                    </div>
+                `).join('');
+            } catch (e) {
+                document.getElementById('appContainer').innerHTML = "<p>Connection Error. Ensure your Sheet has full https:// links in Column C.</p>";
             }
         }
-
-        function renderApps(apps) {
-    const container = document.getElementById('appContainer');
-    container.innerHTML = apps.map(app => {
-        // REPAIR: AppSheet links for non-deployed apps usually need the 'appName=' format
-        // This builds the most reliable link for your specific setup
-        const appUrl = `https://www.appsheet.com/start/${app.appLinkId}`;
-        
-        return `
-            <div class="app-card" onclick="window.open('${appUrl}', '_blank')">
-                <div class="app-header">
-                    <div class="app-icon">${app.name.substring(0,2).toUpperCase()}</div>
-                    <div class="app-name">${app.name}</div>
-                </div>
-                <div class="app-desc">${app.description || ''}</div>
-                <button class="btn">Launch App →</button>
-            </div>
-        `;
-    }).join('');
-}
-
-
-        // Firing the factory engine
-        loadApps();
+        load();
     </script>
 </body>
 </html>
