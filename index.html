@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="SageWire Syndicate - Unified Ranch Operations Dashboard">
+    <title>SageWire Syndicate</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <style>
+        :root {
+            --primary: #e94560;
+            --secondary: #f39c12;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --accent: #0f3460;
+            --text: #ffffff;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0 40px;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 30px;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .controls {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            background: rgba(15, 52, 96, 0.3);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(15, 52, 96, 0.5);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .refresh-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), #d63447);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .app-card {
+            background: rgba(15, 52, 96, 0.5);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(233, 69, 96, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+        }
+
+        .app-card:hover::before {
+            left: 100%;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .app-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .app-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        .app-footer {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .app-link {
+            flex: 1;
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), #d63447);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .app-link:hover {
+            background: linear-gradient(135deg, var(--secondary), #e67e22);
+            transform: scale(1.02);
+        }
+
+        .copy-id {
+            padding: 12px;
+            background: rgba(15, 52, 96, 0.8);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-id:hover {
+            background: rgba(15, 52, 96, 1);
+            color: var(--primary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            border: 4px solid rgba(233, 69, 96, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(233, 69, 96, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .error h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--primary), #d63447);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px 0 30px;
+            }
+
+            .app-card {
+                padding: 20px;
+            }
+
+            .toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ SageWire Syndicate</h1>
+        <p>Unified Command Center for Ranch Operations</p>
+    </div>
+
+    <div class="controls">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search applications...">
+        </div>
+        <button class="refresh-btn" onclick="loadApps(true)">↻ Refresh</button>
+    </div>
+
+    <div id="appContainer" class="app-grid">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading applications from Google Sheets...</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const SHEET_API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+        
+        // Fallback data if sheet fails
+        const FALLBACK_APPS = [
+            {
+                id: '1',
+                name: 'TymMark',
+                appLinkId: 'FieldPins-478069846',
+                description: 'Time clock'
+            },
+            {
+                id: 'fc1659bf',
+                name: "Void's Ledger",
+                appLinkId: 'BrokenFrontierCrosstalkAu',
+                description: 'Void Ledger. Crosstalk. My'
+            },
+            {
+                id: '2a745afd',
+                name: 'Weather Ledger',
+                appLinkId: 'WeatherLedger-47806984',
+                description: 'Weather App'
+            },
+            {
+                id: 'f4bcbb2a',
+                name: 'HerdMate',
+                appLinkId: 'HerdMate_v1-478069846',
+                description: 'Hobby Farm edition of Her'
+            },
+            {
+                id: 'df3d2201',
+                name: 'DCC',
+                appLinkId: 'DCC2-478069846',
+                description: 'Custom cattle managemer'
+            },
+            {
+                id: '9cc497d5',
+                name: 'Supply Warden',
+                appLinkId: 'SupplyWarden-478069846',
+                description: 'Converted from Cart Warc'
+            }
+        ];
+
+        let allApps = [];
+        let filteredApps = [];
+
+        // Generate app icon from name
+        function getAppIcon(name) {
+            const initials = name
+                .split(' ')
+                .map(word => word[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+            return initials;
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text, appName) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`${appName} ID copied!`);
+            }).catch(() => {
+                showToast('Failed to copy');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
+        // Open app
+        function openApp(url, name) {
+            showToast(`Opening ${name}...`);
+            window.open(url, '_blank');
+        }
+
+        // Render apps
+        function renderApps(apps) {
+            const container = document.getElementById('appContainer');
+            
+            if (apps.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <p>No applications found matching your search</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = apps.map(app => {
+                const appUrl = `https://www.appsheet.com/start/${app.appLinkId}`;
+                const icon = getAppIcon(app.name);
+                
+                return `
+                    <div class="app-card" onclick="openApp('${appUrl}', '${app.name}')">
+                        <div class="app-header">
+                            <div class="app-icon">${icon}</div>
+                            <div class="app-name">${app.name}</div>
+                        </div>
+                        <div class="app-description">${app.description || 'No description available'}</div>
+                        <div class="app-footer">
+                            <a href="${appUrl}" class="app-link" onclick="event.stopPropagation()">
+                                Open App →
+                            </a>
+                            <div class="copy-id" 
+                                 onclick="event.stopPropagation(); copyToClipboard('${app.appLinkId}', '${app.name}')" 
+                                 title="Copy App ID">
+                                📋
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load apps from Google Sheets
+        async function loadApps(forceRefresh = false) {
+            const container = document.getElementById('appContainer');
+            
+            if (forceRefresh) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Refreshing applications...</p>
+                    </div>
+                `;
+            }
+
+            try {
+                // Try to load from Google Sheets
+                const response = await fetch(SHEET_API_URL);
+                const data = await response.json();
+                
+                if (data.apps && data.apps.length > 0) {
+                    allApps = data.apps;
+                    filteredApps = allApps;
+                    renderApps(filteredApps);
+                    if (forceRefresh) showToast('Apps refreshed!');
+                } else {
+                    throw new Error('No apps data');
+                }
+            } catch (error) {
+                console.error('Failed to load from Sheets, using fallback:', error);
+                
+                // Use fallback data
+                allApps = FALLBACK_APPS;
+                filteredApps = allApps;
+                
+                container.innerHTML = `
+                    <div class="error">
+                        <h3>⚠️ Using Offline Mode</h3>
+                        <p>Showing cached applications. Check your connection and refresh to sync.</p>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    renderApps(filteredApps);
+                }, 2000);
+            }
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            if (query === '') {
+                filteredApps = allApps;
+            } else {
+                filteredApps = allApps.filter(app => 
+                    app.name.toLowerCase().includes(query) ||
+                    (app.description && app.description.toLowerCase().includes(query)) ||
+                    app.appLinkId.toLowerCase().includes(query)
+                );
+            }
+            
+            renderApps(filteredApps);
+        });
+
+        // PWA support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('✓ Service Worker registered'))
+                    .catch(err => console.log('✗ Service Worker registration failed:', err));
+            });
+        }
+
+        // Initialize
+        loadApps();
+    </script>
+</body>
+</html>
