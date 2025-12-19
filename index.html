@@ -5,85 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SageWire Syndicate Launcher</title>
     <style>
-        :root { 
-            --p: #e94560; 
-            --s: #f39c12; 
-            --bg: #1a1a2e; 
-            --txt: #ffffff; 
-        }
-        body { 
-            background: var(--bg); 
-            color: var(--txt); 
-            font-family: sans-serif; 
-            padding: 20px; 
-            text-align: center; 
-        }
-        h1 { 
-            background: linear-gradient(135deg, var(--p), var(--s)); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            font-size: 2.2rem; 
-            margin-bottom: 10px; 
-            font-weight: bold;
-        }
-        p.subtitle { color: #94a3b8; margin-bottom: 30px; font-size: 1rem; }
-        
-        .app-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px; 
-            max-width: 1000px; 
-            margin: 0 auto; 
-        }
-
-        .app-card { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid #30475e; 
-            border-radius: 15px; 
-            padding: 20px; 
-            text-align: left; 
-            transition: 0.3s; 
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
+        :root { --p: #e94560; --s: #f39c12; --bg: #1a1a2e; --txt: #ffffff; }
+        body { background: var(--bg); color: var(--txt); font-family: sans-serif; padding: 20px; text-align: center; }
+        h1 { background: linear-gradient(135deg, var(--p), var(--s)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; margin-bottom: 30px; }
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
+        .app-card { background: rgba(255,255,255,0.05); border: 1px solid #30475e; border-radius: 15px; padding: 20px; text-align: left; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; }
         .app-card:hover { transform: translateY(-5px); border-color: var(--p); }
-        .app-icon { 
-            width: 50px; 
-            height: 50px; 
-            background: linear-gradient(135deg, var(--p), var(--s)); 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            margin-bottom: 15px; 
-            color: white;
-        }
-        .app-name { font-size: 1.25rem; color: var(--p); font-weight: bold; margin-bottom: 8px; }
-        .app-desc { color: #94a3b8; font-size: 0.9rem; flex-grow: 1; margin-bottom: 15px; }
-        .btn { 
-            background: var(--p); 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            width: 100%; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer;
-        }
+        .app-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--p), var(--s)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 15px; color: white; }
+        .app-name { font-size: 1.2rem; color: var(--p); font-weight: bold; margin-bottom: 8px; }
+        .app-desc { color: #94a3b8; font-size: 0.85rem; min-height: 40px; margin-bottom: 15px; flex-grow: 1; }
+        .btn { background: var(--p); color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>⚡ SageWire Syndicate</h1>
-    <p class="subtitle">Independent App Launcher</p>
-    
     <div id="appContainer" class="app-grid">
-        <p style="grid-column: 1/-1;">Connecting to live directory...</p>
+        <p style="grid-column: 1/-1;">Loading fleet operations...</p>
     </div>
 
     <script>
-        // Use the live URL you provided
         const API_URL = 'https://script.google.com/macros/s/AKfycbxWs6qOjGhm776gjaCXANaVu1hF_Z8hDVLMmXEmfr7S4jwCXB3lWjjLVSYNGExHmWW6fA/exec';
 
         async function load() {
@@ -92,27 +32,24 @@
                 const data = await res.json();
                 const container = document.getElementById('appContainer');
                 
-                if (!data.apps || data.apps.length === 0) {
-                    container.innerHTML = "<p>No apps found. Check your Google Sheet naming.</p>";
-                    return;
-                }
-
+                // This logic maps EXACTLY to your Google Sheet column headers
                 container.innerHTML = data.apps.map(app => {
-    // This grabs the link from your "App Link ID" column
-    const link = app["App Link ID"] || app.appUrl || app.actualLink;
-    
-    return `
-        <div class="app-card" onclick="window.open('${link}', '_blank')">
-            <div class="app-icon">${app["App Name"] ? app["App Name"].substring(0,2).toUpperCase() : 'SW'}</div>
-            <div class="app-name">${app["App Name"]}</div>
-            <div class="app-desc">${app.Description || ''}</div>
-            <button class="btn">Launch App →</button>
-        </div>
-    `;
-}).join('');
+                    const name = app["App Name"] || "Unnamed";
+                    const link = app["App Link ID"] || "#";
+                    const desc = app["Description"] || "";
+                    const iconText = name.substring(0,2).toUpperCase();
 
+                    return `
+                        <div class="app-card" onclick="window.open('${link}', '_blank')">
+                            <div class="app-icon">${iconText}</div>
+                            <div class="app-name">${name}</div>
+                            <div class="app-desc">${desc}</div>
+                            <button class="btn">Launch App →</button>
+                        </div>
+                    `;
+                }).join('');
             } catch (e) {
-                document.getElementById('appContainer').innerHTML = "<p>Connection Error. Ensure your Sheet has full https:// links in Column C.</p>";
+                document.getElementById('appContainer').innerHTML = "<p>Data Error: Ensure your Google Sheet columns are named exactly 'App Name', 'App Link ID', and 'Description'.</p>";
             }
         }
         load();
