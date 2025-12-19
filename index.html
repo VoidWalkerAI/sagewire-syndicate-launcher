@@ -442,17 +442,17 @@
             window.open(url, '_blank');
         }
 
-        // IMPROVED RENDERER: Fixes links for the Cattle App suite
+        // LAUNCHER RENDERER: Connects the launcher to your other apps
 function renderApps(apps) {
     const container = document.getElementById('appContainer');
     
     if (apps.length === 0) {
-        container.innerHTML = '<div class="loading"><p>No cattle apps found</p></div>';
+        container.innerHTML = '<div class="loading"><p>No apps found</p></div>';
         return;
     }
 
     container.innerHTML = apps.map(app => {
-        // FIX: Ensuring the URL is a full AppSheet start link for each cattle module
+        // FIX: This builds the bridge between the launcher and your apps
         const appUrl = app.appLinkId.startsWith('http') 
             ? app.appLinkId 
             : `https://www.appsheet.com/start/${app.appLinkId}`;
@@ -467,7 +467,7 @@ function renderApps(apps) {
                 </div>
                 <div class="app-description">${app.description || ''}</div>
                 <div class="app-footer">
-                    <button class="app-link">Launch Cattle Tool →</button>
+                    <button class="app-link">Launch App →</button>
                     <div class="copy-id" 
                          onclick="event.stopPropagation(); copyToClipboard('${app.appLinkId}', '${app.name}')" 
                          title="Copy App ID">📋</div>
@@ -476,6 +476,7 @@ function renderApps(apps) {
         `;
     }).join('');
 }
+
 
         // Load apps from Google Sheets
         async function loadApps(forceRefresh = false) {
