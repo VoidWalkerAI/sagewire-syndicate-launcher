@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SageWire Syndicate Launcher</title>
+    <title>SageWire Syndicate</title>
     <style>
         :root { --p: #e94560; --s: #f39c12; --bg: #1a1a2e; --txt: #ffffff; }
         body { background: var(--bg); color: var(--txt); font-family: sans-serif; padding: 20px; text-align: center; }
-        h1 { background: linear-gradient(135deg, var(--p), var(--s)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.2rem; font-weight: bold; margin-bottom: 30px; }
         
+        h1 { 
+            background: linear-gradient(135deg, var(--p), var(--s)); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            font-size: 2.2rem; font-weight: bold; margin-bottom: 10px; 
+        }
+        p.sub { color: #94a3b8; margin-bottom: 40px; }
+
         .app-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
@@ -19,45 +25,91 @@
             background: rgba(255,255,255,0.05); border: 1px solid #30475e; 
             border-radius: 15px; padding: 20px; text-align: left; 
             transition: 0.3s; cursor: pointer; display: flex; flex-direction: column;
+            text-decoration: none; color: inherit;
         }
         .app-card:hover { transform: translateY(-5px); border-color: var(--p); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .app-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--p), var(--s)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 15px; color: white; }
-        .app-name { font-size: 1.2rem; color: var(--p); font-weight: bold; margin-bottom: 8px; }
-        .app-desc { color: #94a3b8; font-size: 0.9rem; flex-grow: 1; margin-bottom: 20px; line-height: 1.4; }
-        .btn { background: var(--p); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .app-icon { 
+            width: 45px; height: 45px; 
+            background: linear-gradient(135deg, var(--p), var(--s)); 
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; margin-bottom: 15px; color: white; font-size: 1.2rem;
+        }
+        .app-name { font-size: 1.1rem; color: var(--p); font-weight: bold; margin-bottom: 5px; text-transform: capitalize; }
+        .app-file { color: #506579; font-size: 0.75rem; font-family: monospace; margin-bottom: 15px; }
+        .btn { background: var(--p); color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; text-align: center; margin-top: auto; }
+        
+        /* Loading Spinner */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 50px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
     <h1>⚡ SageWire Syndicate</h1>
+    <p class="sub">Repository Auto-Loader</p>
+
     <div id="appContainer" class="app-grid">
-        <p style="grid-column: 1/-1;">Synchronizing with App Fleet...</p>
+        <div class="loader"></div>
     </div>
 
     <script>
-        // PASTE YOUR NEW URL FROM STEP 1 HERE
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxw2EMwjZR36o4Ifgq99QX4Q391nbe2OnUSMBqQvTerdXB-4uZ20yn1xcKyZ4_NaK2CmA/exec';
+        // ⚠️ CONFIGURATION: CHANGE THESE TO MATCH YOUR GITHUB ⚠️
+        const GITHUB_USERNAME = 'voidwalkerai';  // e.g. 'voidwalkerai'
+        const REPO_NAME = 'sagewire';            // e.g. 'sagewire' or 'sagewire-clinical'
 
-        async function load() {
+        // Don't touch below this line
+        const API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/`;
+        const IGNORE_FILES = ['index.html', '404.html', 'README.md', 'CNAME']; // Files to hide
+
+        async function loadRepo() {
+            const container = document.getElementById('appContainer');
+            
             try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                const container = document.getElementById('appContainer');
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error("Repo not found");
                 
-                if (data.apps) {
-                    container.innerHTML = data.apps.map(app => `
-                        <div class="app-card" onclick="window.open('${app.link}', '_blank')">
-                            <div class="app-icon">${app.name.substring(0,2).toUpperCase()}</div>
-                            <div class="app-name">${app.name}</div>
-                            <div class="app-desc">${app.desc}</div>
-                            <button class="btn">Launch App →</button>
-                        </div>
-                    `).join('');
+                const files = await response.json();
+                
+                // Filter: Only HTML files, and ignore the specific ones listed above
+                const tools = files.filter(file => 
+                    file.name.endsWith('.html') && 
+                    !IGNORE_FILES.includes(file.name)
+                );
+
+                if (tools.length === 0) {
+                    container.innerHTML = "<p>No tools found in this repository folder.</p>";
+                    return;
                 }
-            } catch (e) {
-                document.getElementById('appContainer').innerHTML = "<p>Connection Error. Check API Deployment.</p>";
+
+                container.innerHTML = tools.map(tool => {
+                    // Clean up name: "SageWire_Time.html" -> "Time"
+                    let cleanName = tool.name.replace('SageWire_', '').replace('.html', '').replace(/_/g, ' ');
+                    let initials = cleanName.substring(0,2).toUpperCase();
+
+                    return `
+                        <a href="${tool.name}" class="app-card">
+                            <div class="app-icon">${initials}</div>
+                            <div class="app-name">${cleanName}</div>
+                            <div class="app-file">${tool.name}</div>
+                            <div class="btn">Launch 🚀</div>
+                        </a>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align:center; color:#e74c3c;">
+                        <h3>⚠️ Scan Failed</h3>
+                        <p>Could not read repository: ${GITHUB_USERNAME}/${REPO_NAME}</p>
+                        <p style="font-size:0.8rem; color:#aaa;">Make sure the username/repo are correct and the repo is Public.</p>
+                    </div>
+                `;
             }
         }
-        load();
+
+        loadRepo();
     </script>
 </body>
 </html>
