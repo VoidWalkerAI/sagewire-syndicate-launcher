@@ -1,115 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SageWire Syndicate</title>
-    <style>
-        :root { --p: #e94560; --s: #f39c12; --bg: #1a1a2e; --txt: #ffffff; }
-        body { background: var(--bg); color: var(--txt); font-family: sans-serif; padding: 20px; text-align: center; }
-        
-        h1 { 
-            background: linear-gradient(135deg, var(--p), var(--s)); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            font-size: 2.2rem; font-weight: bold; margin-bottom: 10px; 
-        }
-        p.sub { color: #94a3b8; margin-bottom: 40px; }
-
-        .app-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px; max-width: 1000px; margin: 0 auto; 
-        }
-
-        .app-card { 
-            background: rgba(255,255,255,0.05); border: 1px solid #30475e; 
-            border-radius: 15px; padding: 20px; text-align: left; 
-            transition: 0.3s; cursor: pointer; display: flex; flex-direction: column;
-            text-decoration: none; color: inherit;
-        }
-        .app-card:hover { transform: translateY(-5px); border-color: var(--p); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        
-        .app-icon { 
-            width: 45px; height: 45px; 
-            background: linear-gradient(135deg, var(--p), var(--s)); 
-            border-radius: 8px; display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; margin-bottom: 15px; color: white; font-size: 1.2rem;
-        }
-        .app-name { font-size: 1.1rem; color: var(--p); font-weight: bold; margin-bottom: 5px; text-transform: capitalize; }
-        .app-file { color: #506579; font-size: 0.75rem; font-family: monospace; margin-bottom: 15px; }
-        .btn { background: var(--p); color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; text-align: center; margin-top: auto; }
-        
-        /* Loading Spinner */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 50px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
-
-    <h1>⚡ SageWire Syndicate</h1>
-    <p class="sub">Repository Auto-Loader</p>
-
-    <div id="appContainer" class="app-grid">
-        <div class="loader"></div>
-    </div>
-
-    <script>
-        // ⚠️ CONFIGURATION: CHANGE THESE TO MATCH YOUR GITHUB ⚠️
-        const GITHUB_USERNAME = 'voidwalkerai';  // e.g. 'voidwalkerai'
-        const REPO_NAME = 'SageWire_Tools';            // e.g. 'sagewire' or 'sagewire-clinical'
-
-        // Don't touch below this line
-        const API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/`;
-        const IGNORE_FILES = ['index.html', '404.html', 'README.md', 'CNAME']; // Files to hide
-
-        async function loadRepo() {
-            const container = document.getElementById('appContainer');
-            
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error("Repo not found");
-                
-                const files = await response.json();
-                
-                // Filter: Only HTML files, and ignore the specific ones listed above
-                const tools = files.filter(file => 
-                    file.name.endsWith('.html') && 
-                    !IGNORE_FILES.includes(file.name)
-                );
-
-                if (tools.length === 0) {
-                    container.innerHTML = "<p>No tools found in this repository folder.</p>";
-                    return;
-                }
-
-                container.innerHTML = tools.map(tool => {
-                    // Clean up name: "SageWire_Time.html" -> "Time"
-                    let cleanName = tool.name.replace('SageWire_', '').replace('.html', '').replace(/_/g, ' ');
-                    let initials = cleanName.substring(0,2).toUpperCase();
-
-                    return `
-                        <a href="${tool.name}" class="app-card">
-                            <div class="app-icon">${initials}</div>
-                            <div class="app-name">${cleanName}</div>
-                            <div class="app-file">${tool.name}</div>
-                            <div class="btn">Launch 🚀</div>
-                        </a>
-                    `;
-                }).join('');
-
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align:center; color:#e74c3c;">
-                        <h3>⚠️ Scan Failed</h3>
-                        <p>Could not read repository: ${GITHUB_USERNAME}/${REPO_NAME}</p>
-                        <p style="font-size:0.8rem; color:#aaa;">Make sure the username/repo are correct and the repo is Public.</p>
-                    </div>
-                `;
-            }
-        }
-
-        loadRepo();
-    </script>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#e94560"><meta name="description" content="A live launcher for public SageWire Syndicate repositories and applications.">
+<link rel="manifest" href="manifest.json"><title>SageWire Syndicate</title>
+<style>
+:root{--p:#e94560;--s:#f39c12;--bg:#101426;--panel:#1a2038;--line:#30475e;--txt:#fff;--muted:#94a3b8}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#202747 0,var(--bg) 42%);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px 16px 48px}header{max-width:1100px;margin:0 auto 28px;text-align:center}h1{margin:4px 0 8px;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;background-clip:text;color:transparent;font-size:clamp(2rem,7vw,3.2rem)}.sub{color:var(--muted);margin:0 0 24px}.controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;max-width:720px;margin:0 auto}input,select{min-height:46px;border:1px solid var(--line);border-radius:10px;background:#11172b;color:var(--txt);padding:0 14px;font:inherit}input:focus,select:focus,a:focus-visible{outline:3px solid rgba(243,156,18,.55);outline-offset:2px}.status{min-height:24px;margin:16px 0 0;color:var(--muted);font-size:.9rem}.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;max-width:1100px;margin:0 auto}.app-card{min-width:0;background:rgba(26,32,56,.92);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:left;display:flex;flex-direction:column;box-shadow:0 12px 30px rgba(0,0,0,.16)}.app-card:hover{border-color:var(--p);transform:translateY(-2px);transition:.2s}.card-top{display:flex;gap:13px;align-items:center;margin-bottom:14px}.app-icon{flex:0 0 46px;height:46px;background:linear-gradient(135deg,var(--p),var(--s));border-radius:10px;display:grid;place-items:center;font-weight:800}.app-name{color:#ff7087;font-size:1.08rem;font-weight:750;overflow-wrap:anywhere}.account{color:var(--muted);font-size:.78rem;margin-top:3px}.description{color:#d8dfeb;line-height:1.45;margin:0 0 16px;min-height:2.9em}.meta{display:flex;flex-wrap:wrap;gap:7px;color:var(--muted);font-size:.76rem;margin-bottom:18px}.pill{border:1px solid var(--line);border-radius:999px;padding:4px 8px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:auto}.actions.one{grid-template-columns:1fr}.btn{display:grid;place-items:center;min-height:42px;border-radius:9px;text-decoration:none;color:#fff;font-weight:750}.launch{background:var(--p)}.github{background:#28334e;border:1px solid #425170}.message{grid-column:1/-1;text-align:center;color:var(--muted);padding:52px 18px}.message.error{color:#ff899b}.loader{border:4px solid rgba(255,255,255,.18);border-top-color:var(--p);border-radius:50%;width:34px;height:34px;animation:spin .8s linear infinite;margin:18px auto}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:520px){.controls{grid-template-columns:1fr}body{padding-left:12px;padding-right:12px}}@media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style></head><body>
+<header><h1>⚡ SageWire Syndicate</h1><p class="sub">A live front door to the work.</p><div class="controls"><input id="search" type="search" placeholder="Search repositories" aria-label="Search repositories" disabled><select id="accountFilter" aria-label="Filter by account" disabled><option value="all">Both accounts</option></select></div><p id="status" class="status" aria-live="polite">Loading public repositories…</p></header>
+<main id="appContainer" class="app-grid"><div class="message"><div class="loader" aria-hidden="true"></div>Contacting GitHub…</div></main>
+<script>
+const GITHUB_ACCOUNTS=['VoidWalkerAI','voidwalker-sagewire'];
+const container=document.getElementById('appContainer'),statusLine=document.getElementById('status'),searchInput=document.getElementById('search'),accountFilter=document.getElementById('accountFilter');let repositories=[];
+function escapeHtml(value=''){return String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]))}
+function validWebUrl(value){if(!value)return'';try{const url=new URL(value);return['http:','https:'].includes(url.protocol)?url.href:''}catch{return''}}
+async function fetchAccountRepos(account){const found=[];for(let page=1;;page++){const url=`https://api.github.com/users/${encodeURIComponent(account)}/repos?per_page=100&page=${page}&sort=updated`;const response=await fetch(url,{headers:{Accept:'application/vnd.github+json'}});if(!response.ok){const remaining=response.headers.get('x-ratelimit-remaining');throw new Error(response.status===403&&remaining==='0'?'GitHub rate limit reached. Try again later.':`Could not read ${account} (GitHub ${response.status}).`)}const pageRepos=await response.json();if(!Array.isArray(pageRepos))throw new Error(`GitHub returned an unexpected response for ${account}.`);found.push(...pageRepos);if(pageRepos.length<100)break}return found}
+function render(){const query=searchInput.value.trim().toLowerCase(),owner=accountFilter.value.toLowerCase();const visible=repositories.filter(repo=>{const matchesOwner=owner==='all'||repo.owner.login.toLowerCase()===owner;const haystack=`${repo.name} ${repo.description||''} ${repo.language||''} ${repo.owner.login}`.toLowerCase();return matchesOwner&&haystack.includes(query)});statusLine.textContent=`${visible.length} of ${repositories.length} public active repositories`;if(!visible.length){container.innerHTML='<div class="message">No repositories match that search.</div>';return}container.innerHTML=visible.map(repo=>{const name=escapeHtml(repo.name.replace(/[-_]+/g,' ')),initials=escapeHtml(repo.name.replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase()||'SW'),ownerName=escapeHtml(repo.owner.login),description=escapeHtml(repo.description||'Public source repository'),language=repo.language?`<span class="pill">${escapeHtml(repo.language)}</span>`:'',updated=new Date(repo.updated_at).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}),homepage=validWebUrl(repo.homepage),repoUrl=validWebUrl(repo.html_url),launch=homepage?`<a class="btn launch" href="${escapeHtml(homepage)}" target="_blank" rel="noopener noreferrer">Launch 🚀</a>`:'',github=`<a class="btn github" href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener noreferrer">GitHub</a>`;return `<article class="app-card"><div class="card-top"><div class="app-icon">${initials}</div><div><div class="app-name">${name}</div><div class="account">${ownerName}</div></div></div><p class="description">${description}</p><div class="meta">${language}<span class="pill">Updated ${escapeHtml(updated)}</span></div><div class="actions${homepage?'':' one'}">${launch}${github}</div></article>`}).join('')}
+async function loadRepositories(){try{const results=await Promise.all(GITHUB_ACCOUNTS.map(fetchAccountRepos));repositories=results.flat().filter(repo=>!repo.archived&&!repo.fork&&!repo.disabled).sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));GITHUB_ACCOUNTS.forEach(account=>accountFilter.add(new Option(account,account)));searchInput.disabled=false;accountFilter.disabled=false;searchInput.addEventListener('input',render);accountFilter.addEventListener('change',render);render()}catch(error){console.error(error);statusLine.textContent='Repository loading failed';container.innerHTML=`<div class="message error"><h2>Could not load repositories</h2><p>${escapeHtml(error.message)}</p><p>This launcher only reads public GitHub data. No sign-in is required.</p></div>`}}
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(error=>console.warn('Service worker registration failed:',error)));
+loadRepositories();
+</script></body></html>
